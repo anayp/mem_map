@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Memory Map | Context Mapping Lab</title>
+  <link rel="icon" type="image/svg+xml" href="./context.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="spark"></div>
+      <div class="brand-text">
+        <p class="eyebrow">Context mapping lab</p>
+        <h1>Memory Map</h1>
+        <p class="subtitle">Build, explore, and annotate your repository context.</p>
+      </div>
+    </div>
+    <div class="status-area">
+      <div class="chip live">Live sandbox</div>
+      <div class="chip spec">Spec-aware JSON</div>
+    </div>
+  </header>
+
+  <div class="panel-toggle-row">
+    <button class="ghost" id="toggle-details">Hide details</button>
+    <button class="ghost" id="toggle-controls">Hide controls</button>
+  </div>
+
+  <main class="layout">
+    <section class="panel detail-panel" id="panel-details">
+      <div class="panel-title">
+        <div>
+          <p class="eyebrow">Details</p>
+          <h2 id="detail-title">Select a node</h2>
+        </div>
+        <div class="chip muted" id="detail-type">-</div>
+      </div>
+      <div class="detail-body" id="detail-body">
+        <p>Click a node to inspect its metadata, tasks, and spec mapping.</p>
+      </div>
+      <div class="subpanel">
+        <div class="subpanel-head">
+          <p class="eyebrow">Hierarchy</p>
+          <span class="chip subtle" id="breadcrumb">-</span>
+        </div>
+        <div id="hierarchy" class="hierarchy"></div>
+      </div>
+      <div class="subpanel">
+        <div class="subpanel-head">
+          <p class="eyebrow">Edit metadata</p>
+          <span class="chip subtle" id="edit-node-id">No selection</span>
+        </div>
+        <form id="edit-form">
+          <label for="field-summary">Basic description</label>
+          <input id="field-summary" name="summary" type="text" placeholder="What is this?" />
+
+          <label for="field-context">Higher-level context / dev notes</label>
+          <textarea id="field-context" name="context" rows="3" placeholder="Why it exists, integration notes"></textarea>
+
+          <label for="field-status">Status</label>
+          <select id="field-status" name="status">
+            <option value="TODO">TODO</option>
+            <option value="IN_PROGRESS">IN PROGRESS</option>
+            <option value="DONE">DONE</option>
+          </select>
+
+          <label for="field-tags">Tags (comma separated)</label>
+          <input id="field-tags" name="tags" type="text" placeholder="ui,backend,refactor" />
+
+          <label for="field-code">Code snippet / pointer</label>
+          <textarea id="field-code" name="code" rows="3" placeholder="Key snippet, API signature, or link"></textarea>
+
+          <label for="field-tasks">Tasks (one per line, format: STATUS: title)</label>
+          <textarea id="field-tasks" name="tasks" rows="3" placeholder="TODO: Hook to data\nIN_PROGRESS: Wire save API"></textarea>
+
+          <div class="form-actions">
+            <button type="button" id="save-node" class="primary">Save node</button>
+            <button type="button" id="reset-form" class="ghost">Reset</button>
+          </div>
+          <p class="form-note">Flexible: unknown metadata is preserved and shown in raw view; only mapped fields update.</p>
+        </form>
+      </div>
+
+      <div class="subpanel">
+        <details class="raw-panel" id="raw-panel">
+          <summary>Raw context JSON</summary>
+          <pre id="raw-json">Loading...</pre>
+        </details>
+      </div>
+    </section>
+
+    <section class="panel graph-panel" id="panel-graph">
+      <div class="panel-title">
+        <div>
+          <p class="eyebrow">Graph</p>
+          <h2>Context Links</h2>
+        </div>
+        <div class="graph-actions">
+          <div class="chip subtle" id="board-title">Loading...</div>
+          <button class="ghost" id="freeze-layout">Freeze layout</button>
+          <button class="ghost" id="save-layout">Save layout</button>
+        </div>
+      </div>
+      <div id="graph"></div>
+    </section>
+
+    <section class="panel controls" id="panel-controls">
+      <div class="panel-title">
+        <div>
+          <p class="eyebrow">Navigator</p>
+          <h2>Filters & Search</h2>
+        </div>
+        <button id="reset-view" class="ghost">Reset view</button>
+      </div>
+      <div class="input-group">
+        <label for="search">Search nodes</label>
+        <input type="search" id="search" placeholder="Filter by id, path, tag, or spec text" />
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="toggle-existing" checked /> Existing</label>
+        <label><input type="checkbox" id="toggle-planned" checked /> Planned</label>
+        <label><input type="checkbox" id="toggle-notes" checked /> Notes</label>
+      </div>
+      <div class="subpanel">
+        <div class="subpanel-head">
+          <p class="eyebrow">Data source</p>
+          <span class="chip subtle">Local scan</span>
+        </div>
+        <label for="scan-path">Local path to map</label>
+        <input type="text" id="scan-path" placeholder="e.g. D:\\context_mapping" />
+        <div class="form-actions">
+          <button type="button" id="scan-button" class="primary">Scan path</button>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
+            <input type="checkbox" id="scan-auto" /> Auto-scan on load
+          </label>
+        </div>
+        <label for="api-token">API token (x-memmap-token)</label>
+        <input type="text" id="api-token" placeholder="Optional token for API calls" />
+        <p class="form-note" id="scan-status">Uses /api/scan on the server to build nodes/edges. Falls back to bundled data if it fails.</p>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="swatch file"></span>File</div>
+        <div class="legend-item"><span class="swatch dir"></span>Directory</div>
+        <div class="legend-item"><span class="swatch future"></span>Planned</div>
+        <div class="legend-item"><span class="swatch note"></span>Note</div>
+      </div>
+
+      <div class="subpanel tree-panel">
+        <div class="subpanel-head">
+          <p class="eyebrow">File explorer</p>
+          <span class="chip subtle">Directories collapsible</span>
+        </div>
+        <div id="file-tree" class="tree-container"></div>
+      </div>
+
+      <div class="stats" id="stats">
+        <div class="stat">
+          <p class="label">Nodes</p>
+          <p class="value">0</p>
+        </div>
+        <div class="stat">
+          <p class="label">Edges</p>
+          <p class="value">0</p>
+        </div>
+        <div class="stat">
+          <p class="label">Planned</p>
+          <p class="value">0</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/force-graph"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

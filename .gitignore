@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Memory Map runtime artifacts
+mem_map/data/context-data.json.bak
+mem_map/data/context-data.log
+
+# Local/AI tooling (do not publish)
+skills.md
+mem_map.zip
+memory-map-improvements-A-F.md

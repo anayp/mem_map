@@ -1,0 +1,226 @@
+{
+  "schema_version": 2,
+  "board_id": "mem-map-demo",
+  "board_version": 1,
+  "title": "Memory Map Prototype",
+  "content": {
+    "nodes": [
+      {
+        "id": "root",
+        "type": "DIRECTORY",
+        "payload": { "path": "/", "exists": true },
+        "metadata": {
+          "summary": "Workspace for the context mapping lab (Memory Map prototype + reference init spec).",
+          "dev_notes": "Workspace entry; serves as the anchor for all nodes. Context system experiments live here.",
+          "tags": ["workspace", "context-system"],
+          "tasks": [{ "title": "Keep context JSON in sync", "status": "IN_PROGRESS" }]
+        }
+      },
+      {
+        "id": "mem_map",
+        "type": "DIRECTORY",
+        "payload": { "path": "mem_map", "exists": true },
+        "metadata": {
+          "summary": "Memory Map prototype (UI + static server).",
+          "dev_notes": "Core prototype for visual context mapping; includes UI, API server, and sample data.",
+          "tags": ["ui", "prototype"],
+          "status": "IN_PROGRESS"
+        }
+      },
+      {
+        "id": "mem_map/index.html",
+        "type": "FILE",
+        "payload": { "path": "mem_map/index.html", "exists": true },
+        "metadata": {
+          "summary": "Single-page UI shell: graph canvas, details, hierarchy, raw JSON accordion.",
+          "dev_notes": "ForceGraph CDN; panels toggle; detail panel on left, controls right/bottom; layout freeze/save buttons.",
+          "tags": ["ui", "layout"],
+          "status": "IN_PROGRESS"
+        }
+      },
+      {
+        "id": "mem_map/style.css",
+        "type": "FILE",
+        "payload": { "path": "mem_map/style.css", "exists": true },
+        "metadata": {
+          "summary": "Styles for layout, responsive grid, panel scrolling, badges, raw JSON accordion.",
+          "dev_notes": "Panels have max-heights, overflow handling; hidden-panel class for toggles; left panel scrolls with section gaps.",
+          "tags": ["style", "responsive"],
+          "status": "TODO",
+          "tasks": [
+            {
+              "title": "fix bad ui. make it responsive and each parts ui should be scrollable to fit overflow. keep the current left pane at the bottom. the pane at the right with details should be on the left. both of these should be toggleable and/or become visible when a node in the graph is clicked on. maybe the stored metadat cpuld also be show on hover pverview",
+              "status": "TODO"
+            }
+          ]
+        }
+      },
+      {
+        "id": "mem_map/app.js",
+        "type": "FILE",
+        "payload": { "path": "mem_map/app.js", "exists": true },
+        "metadata": {
+          "summary": "Client logic: load/apply context, filters, detail/edit, save, auto-scan local paths.",
+          "dev_notes": "Loads via /api/context; scan via /api/scan; auth token header; layout freeze/save; debounced renders; view/layout persisted.",
+          "tags": ["logic", "client"],
+          "status": "IN_PROGRESS",
+          "tasks": [
+            { "title": "Improve hover previews from metadata summary/context", "status": "TODO" }
+          ]
+        }
+      },
+      {
+        "id": "mem_map/data",
+        "type": "DIRECTORY",
+        "payload": { "path": "mem_map/data", "exists": true },
+        "metadata": {
+          "summary": "Data folder for context JSON.",
+          "tags": ["data"]
+        }
+      },
+      {
+        "id": "mem_map/data/context-data.json",
+        "type": "FILE",
+        "payload": { "path": "mem_map/data/context-data.json", "exists": true },
+        "metadata": {
+          "summary": "Bundled demo context + default save target.",
+          "dev_notes": "Overwritten by Save or /api/scan responses; schema_version 2 with content/view separation.",
+          "tags": ["data"]
+        }
+      },
+      {
+        "id": "mem_map/server.js",
+        "type": "FILE",
+        "payload": { "path": "mem_map/server.js", "exists": true },
+        "metadata": {
+          "summary": "Static server + APIs for saving context and scanning local paths.",
+          "dev_notes": "Serves UI + APIs; token-gated; scan sandbox/limits; atomic saves with backup/journal; GET /api/context; serves favicon.",
+          "tags": ["server", "api"],
+          "tasks": [
+            { "title": "Start server to test UI", "status": "TODO" },
+            { "title": "Optionally add auth/rate limits", "status": "TODO" }
+          ]
+        }
+      },
+      {
+        "id": "init_context_system.md",
+        "type": "FILE",
+        "payload": { "path": "init_context_system.md", "exists": true },
+        "metadata": {
+          "summary": "Reference context system init protocol; not driving this prototype directly.",
+          "dev_notes": "Use as ideas for metadata schema and sync patterns.",
+          "tags": ["reference"]
+        }
+      },
+      {
+        "id": "README.md",
+        "type": "FILE",
+        "payload": { "path": "README.md", "exists": true },
+        "metadata": {
+          "summary": "Project overview, setup, and usage.",
+          "dev_notes": "Describes Memory Map features, API, and safety notes.",
+          "tags": ["docs"]
+        }
+      },
+      {
+        "id": "LICENSE",
+        "type": "FILE",
+        "payload": { "path": "LICENSE", "exists": true },
+        "metadata": {
+          "summary": "MIT license for public distribution.",
+          "tags": ["legal"]
+        }
+      },
+      {
+        "id": "CONTRIBUTING.md",
+        "type": "FILE",
+        "payload": { "path": "CONTRIBUTING.md", "exists": true },
+        "metadata": {
+          "summary": "Contribution guidelines for changes and PRs.",
+          "tags": ["docs", "community"]
+        }
+      },
+      {
+        "id": "CODE_OF_CONDUCT.md",
+        "type": "FILE",
+        "payload": { "path": "CODE_OF_CONDUCT.md", "exists": true },
+        "metadata": {
+          "summary": "Community conduct expectations.",
+          "tags": ["docs", "community"]
+        }
+      },
+      {
+        "id": "SECURITY.md",
+        "type": "FILE",
+        "payload": { "path": "SECURITY.md", "exists": true },
+        "metadata": {
+          "summary": "Security reporting guidance.",
+          "tags": ["docs", "security"]
+        }
+      },
+      {
+        "id": ".gitignore",
+        "type": "FILE",
+        "payload": { "path": ".gitignore", "exists": true },
+        "metadata": {
+          "summary": "Ignore rules for runtime artifacts and local tooling.",
+          "tags": ["meta"]
+        }
+      },
+      {
+        "id": "mem_map/context-mapping-notes.md",
+        "type": "FILE",
+        "payload": { "path": "mem_map/context-mapping-notes.md", "exists": true },
+        "metadata": {
+          "summary": "Working notes and roadmap for Memory Map improvements.",
+          "dev_notes": "Contains expert synthesis, risks, schema v2 sketch, and implementation order.",
+          "tags": ["notes", "roadmap"]
+        }
+      },
+      {
+        "id": "mem_map/context.svg",
+        "type": "FILE",
+        "payload": { "path": "mem_map/context.svg", "exists": true },
+        "metadata": {
+          "summary": "Favicon/icon used by the Memory Map UI.",
+          "dev_notes": "100x100 SVG served at /favicon.ico.",
+          "tags": ["asset", "icon"]
+        }
+      },
+      {
+        "id": "context-note",
+        "type": "NOTE",
+        "payload": { "path": "notes/prototype", "exists": false },
+        "metadata": {
+          "summary": "Focus on UI/flow first; wire to real data later.",
+          "dev_notes": "Do not run init protocol; this is a separate prototype.",
+          "tags": ["note"]
+        }
+      }
+    ],
+    "edges": [
+      { "from": "root", "to": "mem_map", "type": "CONTAINS" },
+      { "from": "root", "to": "init_context_system.md", "type": "CONTAINS" },
+      { "from": "root", "to": "README.md", "type": "CONTAINS" },
+      { "from": "root", "to": "LICENSE", "type": "CONTAINS" },
+      { "from": "root", "to": "CONTRIBUTING.md", "type": "CONTAINS" },
+      { "from": "root", "to": "CODE_OF_CONDUCT.md", "type": "CONTAINS" },
+      { "from": "root", "to": "SECURITY.md", "type": "CONTAINS" },
+      { "from": "root", "to": ".gitignore", "type": "CONTAINS" },
+      { "from": "mem_map", "to": "mem_map/index.html", "type": "CONTAINS" },
+      { "from": "mem_map", "to": "mem_map/style.css", "type": "CONTAINS" },
+      { "from": "mem_map", "to": "mem_map/app.js", "type": "CONTAINS" },
+      { "from": "mem_map", "to": "mem_map/data", "type": "CONTAINS" },
+      { "from": "mem_map/data", "to": "mem_map/data/context-data.json", "type": "CONTAINS" },
+      { "from": "mem_map", "to": "mem_map/server.js", "type": "CONTAINS" },
+      { "from": "mem_map", "to": "mem_map/context-mapping-notes.md", "type": "CONTAINS" },
+      { "from": "mem_map", "to": "mem_map/context.svg", "type": "CONTAINS" },
+      { "from": "mem_map", "to": "context-note", "type": "RELATED" }
+    ]
+  },
+  "view": {
+    "layout": { "positions": {}, "frozen": false },
+    "filters": { "search": "", "showExisting": true, "showPlanned": true, "showNotes": true },
+    "panels": { "details": true, "controls": true }
+  }
+}
