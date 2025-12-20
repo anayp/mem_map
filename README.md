@@ -50,6 +50,7 @@ PORT=4501 MEMMAP_TOKEN=yourtoken MEMMAP_SCAN_ROOT=D:\repos node mem_map/server.j
 - `mem_map/server.js` - local server + APIs
 - `mem_map/data/context-data.json` - canonical board JSON
 - `init_context_system.md` - init protocol and schema notes
+- `extensions/codex/` - Codex CLI skill bundle
 
 ## Safety notes
 This tool is local-first and sandboxed by default. If you enable scanning
@@ -60,3 +61,17 @@ outside the repo, treat the API like a local admin surface:
 
 ## License
 MIT (see `LICENSE`).
+
+## Codex CLI extension
+Memory Map ships a Codex skill bundle in `extensions/codex/`.
+
+Install:
+1) Enable Codex skills (`skills = true` in `~/.codex/config.toml` or run `codex --enable skills`).
+2) Copy:
+   - `extensions/codex/SKILL.md` -> `~/.codex/skills/memory-map/SKILL.md`
+3) Restart Codex.
+
+Use:
+```
+$memory-map-init
+```

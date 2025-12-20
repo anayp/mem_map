@@ -168,6 +168,43 @@ const fallbackContext = {
         }
       },
       {
+        id: "extensions",
+        type: "DIRECTORY",
+        payload: { path: "extensions", exists: true },
+        metadata: {
+          summary: "Extension bundles for CLI integrations.",
+          tags: ["extensions"]
+        }
+      },
+      {
+        id: "extensions/codex",
+        type: "DIRECTORY",
+        payload: { path: "extensions/codex", exists: true },
+        metadata: {
+          summary: "Codex CLI skill bundle for Memory Map.",
+          tags: ["extensions", "codex"]
+        }
+      },
+      {
+        id: "extensions/codex/SKILL.md",
+        type: "FILE",
+        payload: { path: "extensions/codex/SKILL.md", exists: true },
+        metadata: {
+          summary: "Skill definition for initializing Memory Map.",
+          dev_notes: "Copy to ~/.codex/skills/memory-map/SKILL.md.",
+          tags: ["extensions", "codex", "skill"]
+        }
+      },
+      {
+        id: "extensions/codex/README.md",
+        type: "FILE",
+        payload: { path: "extensions/codex/README.md", exists: true },
+        metadata: {
+          summary: "Install and usage notes for the Codex skill.",
+          tags: ["extensions", "docs"]
+        }
+      },
+      {
         id: "mem_map/context-mapping-notes.md",
         type: "FILE",
         payload: { path: "mem_map/context-mapping-notes.md", exists: true },
@@ -207,6 +244,10 @@ const fallbackContext = {
       { from: "root", to: "CODE_OF_CONDUCT.md", type: "CONTAINS" },
       { from: "root", to: "SECURITY.md", type: "CONTAINS" },
       { from: "root", to: ".gitignore", type: "CONTAINS" },
+      { from: "root", to: "extensions", type: "CONTAINS" },
+      { from: "extensions", to: "extensions/codex", type: "CONTAINS" },
+      { from: "extensions/codex", to: "extensions/codex/SKILL.md", type: "CONTAINS" },
+      { from: "extensions/codex", to: "extensions/codex/README.md", type: "CONTAINS" },
       { from: "mem_map", to: "mem_map/index.html", type: "CONTAINS" },
       { from: "mem_map", to: "mem_map/style.css", type: "CONTAINS" },
       { from: "mem_map", to: "mem_map/app.js", type: "CONTAINS" },
