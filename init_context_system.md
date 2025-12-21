@@ -27,7 +27,10 @@ Required:
 - `mem_map/style.css`
 - `mem_map/app.js`
 - `mem_map/server.js`
+- `mem_map/server.js`
 - `mem_map/data/context-data.json`
+- `package.json` (scripts)
+- `sync_mem_map.js` (API client)
 
 Optional:
 - `mem_map/context.svg` (favicon)
@@ -121,6 +124,14 @@ Environment variables:
 - `MEMMAP_MAX_BYTES` (default 26214400)
 - `MEMMAP_DEBUG_ABS` (if set, include absPath in scan payload)
 
+### 4.1 Security & Authentication
+**Context**: The server allows reading/writing your file hierarchy.
+**Why use it**: If running in a shared environment or exposing to a network.
+**How to use**:
+1.  Start server with `MEMMAP_TOKEN=secret123 node mem_map/server.js`.
+2.  Clients must send header `x-memmap-token: secret123`.
+3.  The UI supports entering this token in the "Navigator" panel.
+
 ---
 
 ## 5) Templates (minimal)
@@ -166,6 +177,33 @@ The UI shell:
 - Right: controls + scan + file explorer + stats
 
 Use the `mem_map/index.html` and `mem_map/style.css` in this repo as the canonical templates.
+
+### 5.5 package.json
+Enables standard npm workflows (`npm start`, `npm run scan`).
+
+```json
+{
+  "name": "memory-map-context",
+  "version": "1.0.0",
+  "description": "Granular context visualization and planning tool",
+  "scripts": {
+    "start": "node mem_map/server.js",
+    "scan": "node sync_mem_map.js",
+    "init": "echo 'See SKILL.md or init_context_system.md'"
+  },
+  "dependencies": {}
+}
+```
+
+### 5.6 sync_mem_map.js
+Robust API client for syncing the graph.
+
+```javascript
+const http = require('http');
+const path = require('path');
+// ... [Use the content of sync_mem_map.js from this repo]
+```
+(See `sync_mem_map.js` in this repo for full source)
 
 ---
 
