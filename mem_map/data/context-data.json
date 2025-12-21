@@ -1,267 +1,637 @@
 {
   "schema_version": 2,
-  "board_id": "mem-map-demo",
-  "board_version": 1,
-  "title": "Memory Map Prototype",
+  "board_id": "scan:context_mapping",
+  "board_version": 3,
+  "title": "Scan of D:\\context_mapping",
   "content": {
     "nodes": [
       {
-        "id": "root",
+        "id": "context_mapping",
         "type": "DIRECTORY",
-        "payload": { "path": "/", "exists": true },
+        "payload": {
+          "relPath": ".",
+          "path": ".",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Workspace for the context mapping lab (Memory Map prototype + reference init spec).",
-          "dev_notes": "Workspace entry; serves as the anchor for all nodes. Context system experiments live here.",
-          "tags": ["workspace", "context-system"],
-          "tasks": [{ "title": "Keep context JSON in sync", "status": "IN_PROGRESS" }]
+          "summary": "Directory: context_mapping",
+          "tags": [
+            "dir"
+          ]
         }
       },
       {
         "id": "mem_map",
         "type": "DIRECTORY",
-        "payload": { "path": "mem_map", "exists": true },
+        "payload": {
+          "relPath": "mem_map",
+          "path": "mem_map",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Memory Map prototype (UI + static server).",
-          "dev_notes": "Core prototype for visual context mapping; includes UI, API server, and sample data.",
-          "tags": ["ui", "prototype"],
-          "status": "IN_PROGRESS"
-        }
-      },
-      {
-        "id": "mem_map/index.html",
-        "type": "FILE",
-        "payload": { "path": "mem_map/index.html", "exists": true },
-        "metadata": {
-          "summary": "Single-page UI shell: graph canvas, details, hierarchy, raw JSON accordion.",
-          "dev_notes": "ForceGraph CDN; panels toggle; detail panel on left, controls right/bottom; layout freeze/save buttons.",
-          "tags": ["ui", "layout"],
-          "status": "IN_PROGRESS"
-        }
-      },
-      {
-        "id": "mem_map/style.css",
-        "type": "FILE",
-        "payload": { "path": "mem_map/style.css", "exists": true },
-        "metadata": {
-          "summary": "Styles for layout, responsive grid, panel scrolling, badges, raw JSON accordion.",
-          "dev_notes": "Panels have max-heights, overflow handling; hidden-panel class for toggles; left panel scrolls with section gaps.",
-          "tags": ["style", "responsive"],
-          "status": "TODO",
-          "tasks": [
-            {
-              "title": "fix bad ui. make it responsive and each parts ui should be scrollable to fit overflow. keep the current left pane at the bottom. the pane at the right with details should be on the left. both of these should be toggleable and/or become visible when a node in the graph is clicked on. maybe the stored metadat cpuld also be show on hover pverview",
-              "status": "TODO"
-            }
-          ]
-        }
-      },
-      {
-        "id": "mem_map/app.js",
-        "type": "FILE",
-        "payload": { "path": "mem_map/app.js", "exists": true },
-        "metadata": {
-          "summary": "Client logic: load/apply context, filters, detail/edit, save, auto-scan local paths.",
-          "dev_notes": "Loads via /api/context; scan via /api/scan; auth token header; layout freeze/save; debounced renders; view/layout persisted.",
-          "tags": ["logic", "client"],
-          "status": "IN_PROGRESS",
-          "tasks": [
-            { "title": "Improve hover previews from metadata summary/context", "status": "TODO" }
+          "summary": "Directory: mem_map",
+          "tags": [
+            "dir"
           ]
         }
       },
       {
         "id": "mem_map/data",
         "type": "DIRECTORY",
-        "payload": { "path": "mem_map/data", "exists": true },
+        "payload": {
+          "relPath": "mem_map/data",
+          "path": "mem_map/data",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Data folder for context JSON.",
-          "tags": ["data"]
+          "summary": "Directory: data",
+          "tags": [
+            "dir"
+          ]
+        }
+      },
+      {
+        "id": "mem_map/data/context-data.json.bak",
+        "type": "FILE",
+        "payload": {
+          "relPath": "mem_map/data/context-data.json.bak",
+          "path": "mem_map/data/context-data.json.bak",
+          "exists": true
+        },
+        "metadata": {
+          "summary": "File: context-data.json.bak",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
         "id": "mem_map/data/context-data.json",
         "type": "FILE",
-        "payload": { "path": "mem_map/data/context-data.json", "exists": true },
+        "payload": {
+          "relPath": "mem_map/data/context-data.json",
+          "path": "mem_map/data/context-data.json",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Bundled demo context + default save target.",
-          "dev_notes": "Overwritten by Save or /api/scan responses; schema_version 2 with content/view separation.",
-          "tags": ["data"]
+          "summary": "File: context-data.json",
+          "tags": [
+            "file"
+          ]
+        }
+      },
+      {
+        "id": "mem_map/index.html",
+        "type": "FILE",
+        "payload": {
+          "relPath": "mem_map/index.html",
+          "path": "mem_map/index.html",
+          "exists": true
+        },
+        "metadata": {
+          "summary": "File: index.html",
+          "tags": [
+            "file"
+          ]
+        }
+      },
+      {
+        "id": "mem_map/style.css",
+        "type": "FILE",
+        "payload": {
+          "relPath": "mem_map/style.css",
+          "path": "mem_map/style.css",
+          "exists": true
+        },
+        "metadata": {
+          "summary": "File: style.css",
+          "tags": [
+            "file"
+          ]
+        }
+      },
+      {
+        "id": "mem_map/app.js",
+        "type": "FILE",
+        "payload": {
+          "relPath": "mem_map/app.js",
+          "path": "mem_map/app.js",
+          "exists": true
+        },
+        "metadata": {
+          "summary": "File: app.js",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
         "id": "mem_map/server.js",
         "type": "FILE",
-        "payload": { "path": "mem_map/server.js", "exists": true },
+        "payload": {
+          "relPath": "mem_map/server.js",
+          "path": "mem_map/server.js",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Static server + APIs for saving context and scanning local paths.",
-          "dev_notes": "Serves UI + APIs; token-gated; scan sandbox/limits; atomic saves with backup/journal; GET /api/context; serves favicon.",
-          "tags": ["server", "api"],
-          "tasks": [
-            { "title": "Start server to test UI", "status": "TODO" },
-            { "title": "Optionally add auth/rate limits", "status": "TODO" }
+          "summary": "File: server.js",
+          "tags": [
+            "file"
+          ]
+        }
+      },
+      {
+        "id": "mem_map/context-mapping-notes.md",
+        "type": "FILE",
+        "payload": {
+          "relPath": "mem_map/context-mapping-notes.md",
+          "path": "mem_map/context-mapping-notes.md",
+          "exists": true
+        },
+        "metadata": {
+          "summary": "File: context-mapping-notes.md",
+          "tags": [
+            "file"
+          ]
+        }
+      },
+      {
+        "id": "mem_map/context.svg",
+        "type": "FILE",
+        "payload": {
+          "relPath": "mem_map/context.svg",
+          "path": "mem_map/context.svg",
+          "exists": true
+        },
+        "metadata": {
+          "summary": "File: context.svg",
+          "tags": [
+            "file"
+          ]
+        }
+      },
+      {
+        "id": "memory-map-improvements-A-F.md",
+        "type": "FILE",
+        "payload": {
+          "relPath": "memory-map-improvements-A-F.md",
+          "path": "memory-map-improvements-A-F.md",
+          "exists": true
+        },
+        "metadata": {
+          "summary": "File: memory-map-improvements-A-F.md",
+          "tags": [
+            "file"
           ]
         }
       },
       {
         "id": "init_context_system.md",
         "type": "FILE",
-        "payload": { "path": "init_context_system.md", "exists": true },
+        "payload": {
+          "relPath": "init_context_system.md",
+          "path": "init_context_system.md",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Reference context system init protocol; not driving this prototype directly.",
-          "dev_notes": "Use as ideas for metadata schema and sync patterns.",
-          "tags": ["reference"]
+          "summary": "File: init_context_system.md",
+          "tags": [
+            "file"
+          ]
+        }
+      },
+      {
+        "id": "skills.md",
+        "type": "FILE",
+        "payload": {
+          "relPath": "skills.md",
+          "path": "skills.md",
+          "exists": true
+        },
+        "metadata": {
+          "summary": "File: skills.md",
+          "tags": [
+            "file"
+          ]
+        }
+      },
+      {
+        "id": "mem_map.zip",
+        "type": "FILE",
+        "payload": {
+          "relPath": "mem_map.zip",
+          "path": "mem_map.zip",
+          "exists": true
+        },
+        "metadata": {
+          "summary": "File: mem_map.zip",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
         "id": "README.md",
         "type": "FILE",
-        "payload": { "path": "README.md", "exists": true },
+        "payload": {
+          "relPath": "README.md",
+          "path": "README.md",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Project overview, setup, and usage.",
-          "dev_notes": "Describes Memory Map features, API, and safety notes.",
-          "tags": ["docs"]
+          "summary": "File: README.md",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
         "id": "LICENSE",
         "type": "FILE",
-        "payload": { "path": "LICENSE", "exists": true },
+        "payload": {
+          "relPath": "LICENSE",
+          "path": "LICENSE",
+          "exists": true
+        },
         "metadata": {
-          "summary": "MIT license for public distribution.",
-          "tags": ["legal"]
+          "summary": "File: LICENSE",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
         "id": "CONTRIBUTING.md",
         "type": "FILE",
-        "payload": { "path": "CONTRIBUTING.md", "exists": true },
+        "payload": {
+          "relPath": "CONTRIBUTING.md",
+          "path": "CONTRIBUTING.md",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Contribution guidelines for changes and PRs.",
-          "tags": ["docs", "community"]
+          "summary": "File: CONTRIBUTING.md",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
         "id": "CODE_OF_CONDUCT.md",
         "type": "FILE",
-        "payload": { "path": "CODE_OF_CONDUCT.md", "exists": true },
+        "payload": {
+          "relPath": "CODE_OF_CONDUCT.md",
+          "path": "CODE_OF_CONDUCT.md",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Community conduct expectations.",
-          "tags": ["docs", "community"]
+          "summary": "File: CODE_OF_CONDUCT.md",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
         "id": "SECURITY.md",
         "type": "FILE",
-        "payload": { "path": "SECURITY.md", "exists": true },
+        "payload": {
+          "relPath": "SECURITY.md",
+          "path": "SECURITY.md",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Security reporting guidance.",
-          "tags": ["docs", "security"]
+          "summary": "File: SECURITY.md",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
         "id": ".gitignore",
         "type": "FILE",
-        "payload": { "path": ".gitignore", "exists": true },
+        "payload": {
+          "relPath": ".gitignore",
+          "path": ".gitignore",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Ignore rules for runtime artifacts and local tooling.",
-          "tags": ["meta"]
+          "summary": "File: .gitignore",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
         "id": "extensions",
         "type": "DIRECTORY",
-        "payload": { "path": "extensions", "exists": true },
+        "payload": {
+          "relPath": "extensions",
+          "path": "extensions",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Extension bundles for CLI integrations.",
-          "tags": ["extensions"]
+          "summary": "Directory: extensions",
+          "tags": [
+            "dir"
+          ]
         }
       },
       {
         "id": "extensions/codex",
         "type": "DIRECTORY",
-        "payload": { "path": "extensions/codex", "exists": true },
+        "payload": {
+          "relPath": "extensions/codex",
+          "path": "extensions/codex",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Codex CLI skill bundle for Memory Map.",
-          "tags": ["extensions", "codex"]
+          "summary": "Directory: codex",
+          "tags": [
+            "dir"
+          ]
         }
       },
       {
         "id": "extensions/codex/SKILL.md",
         "type": "FILE",
-        "payload": { "path": "extensions/codex/SKILL.md", "exists": true },
+        "payload": {
+          "relPath": "extensions/codex/SKILL.md",
+          "path": "extensions/codex/SKILL.md",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Skill definition for initializing Memory Map.",
-          "dev_notes": "Copy to ~/.codex/skills/memory-map/SKILL.md.",
-          "tags": ["extensions", "codex", "skill"]
+          "summary": "File: SKILL.md",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
         "id": "extensions/codex/README.md",
         "type": "FILE",
-        "payload": { "path": "extensions/codex/README.md", "exists": true },
+        "payload": {
+          "relPath": "extensions/codex/README.md",
+          "path": "extensions/codex/README.md",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Install and usage notes for the Codex skill.",
-          "tags": ["extensions", "docs"]
+          "summary": "File: README.md",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
-        "id": "mem_map/context-mapping-notes.md",
+        "id": "extensions/gemini",
+        "type": "DIRECTORY",
+        "payload": {
+          "relPath": "extensions/gemini",
+          "path": "extensions/gemini",
+          "exists": true
+        },
+        "metadata": {
+          "summary": "Directory: gemini",
+          "tags": [
+            "dir"
+          ]
+        }
+      },
+      {
+        "id": "extensions/gemini/README.md",
         "type": "FILE",
-        "payload": { "path": "mem_map/context-mapping-notes.md", "exists": true },
+        "payload": {
+          "relPath": "extensions/gemini/README.md",
+          "path": "extensions/gemini/README.md",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Working notes and roadmap for Memory Map improvements.",
-          "dev_notes": "Contains expert synthesis, risks, schema v2 sketch, and implementation order.",
-          "tags": ["notes", "roadmap"]
+          "summary": "File: README.md",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
-        "id": "mem_map/context.svg",
+        "id": "extensions/gemini/GEMINI.md",
         "type": "FILE",
-        "payload": { "path": "mem_map/context.svg", "exists": true },
+        "payload": {
+          "relPath": "extensions/gemini/GEMINI.md",
+          "path": "extensions/gemini/GEMINI.md",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Favicon/icon used by the Memory Map UI.",
-          "dev_notes": "100x100 SVG served at /favicon.ico.",
-          "tags": ["asset", "icon"]
+          "summary": "File: GEMINI.md",
+          "tags": [
+            "file"
+          ]
         }
       },
       {
-        "id": "context-note",
+        "id": "conductor",
+        "type": "DIRECTORY",
+        "payload": {
+          "path": "conductor",
+          "exists": true
+        },
+        "metadata": {
+          "summary": "Conductor planning system (git-ignored).",
+          "tags": [
+            "planning",
+            "conductor"
+          ]
+        }
+      },
+      {
+        "id": "conductor/tracks/001-integrate-mem-map",
         "type": "NOTE",
-        "payload": { "path": "notes/prototype", "exists": false },
+        "payload": {
+          "path": "conductor/tracks/001-integrate-mem-map/plan.md",
+          "exists": true
+        },
         "metadata": {
-          "summary": "Focus on UI/flow first; wire to real data later.",
-          "dev_notes": "Do not run init protocol; this is a separate prototype.",
-          "tags": ["note"]
+          "summary": "Integrate Conductor with Memory Map",
+          "status": "IN_PROGRESS",
+          "tasks": [
+            {
+              "title": "Initialize Conductor structure",
+              "status": "DONE"
+            },
+            {
+              "title": "Create a sync script/tool",
+              "status": "IN_PROGRESS"
+            },
+            {
+              "title": "Add Conductor track status to Memory Map nodes",
+              "status": "TODO"
+            },
+            {
+              "title": "Verify visualization",
+              "status": "TODO"
+            }
+          ],
+          "tags": [
+            "track",
+            "active"
+          ]
         }
       }
     ],
     "edges": [
-      { "from": "root", "to": "mem_map", "type": "CONTAINS" },
-      { "from": "root", "to": "init_context_system.md", "type": "CONTAINS" },
-      { "from": "root", "to": "README.md", "type": "CONTAINS" },
-      { "from": "root", "to": "LICENSE", "type": "CONTAINS" },
-      { "from": "root", "to": "CONTRIBUTING.md", "type": "CONTAINS" },
-      { "from": "root", "to": "CODE_OF_CONDUCT.md", "type": "CONTAINS" },
-      { "from": "root", "to": "SECURITY.md", "type": "CONTAINS" },
-      { "from": "root", "to": ".gitignore", "type": "CONTAINS" },
-      { "from": "root", "to": "extensions", "type": "CONTAINS" },
-      { "from": "extensions", "to": "extensions/codex", "type": "CONTAINS" },
-      { "from": "extensions/codex", "to": "extensions/codex/SKILL.md", "type": "CONTAINS" },
-      { "from": "extensions/codex", "to": "extensions/codex/README.md", "type": "CONTAINS" },
-      { "from": "mem_map", "to": "mem_map/index.html", "type": "CONTAINS" },
-      { "from": "mem_map", "to": "mem_map/style.css", "type": "CONTAINS" },
-      { "from": "mem_map", "to": "mem_map/app.js", "type": "CONTAINS" },
-      { "from": "mem_map", "to": "mem_map/data", "type": "CONTAINS" },
-      { "from": "mem_map/data", "to": "mem_map/data/context-data.json", "type": "CONTAINS" },
-      { "from": "mem_map", "to": "mem_map/server.js", "type": "CONTAINS" },
-      { "from": "mem_map", "to": "mem_map/context-mapping-notes.md", "type": "CONTAINS" },
-      { "from": "mem_map", "to": "mem_map/context.svg", "type": "CONTAINS" },
-      { "from": "mem_map", "to": "context-note", "type": "RELATED" }
+      {
+        "from": "context_mapping",
+        "to": "mem_map",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "mem_map",
+        "to": "mem_map/data",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "mem_map/data",
+        "to": "mem_map/data/context-data.json.bak",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "mem_map/data",
+        "to": "mem_map/data/context-data.json",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "mem_map",
+        "to": "mem_map/index.html",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "mem_map",
+        "to": "mem_map/style.css",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "mem_map",
+        "to": "mem_map/app.js",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "mem_map",
+        "to": "mem_map/server.js",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "mem_map",
+        "to": "mem_map/context-mapping-notes.md",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "mem_map",
+        "to": "mem_map/context.svg",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "context_mapping",
+        "to": "memory-map-improvements-A-F.md",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "context_mapping",
+        "to": "init_context_system.md",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "context_mapping",
+        "to": "skills.md",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "context_mapping",
+        "to": "mem_map.zip",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "context_mapping",
+        "to": "README.md",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "context_mapping",
+        "to": "LICENSE",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "context_mapping",
+        "to": "CONTRIBUTING.md",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "context_mapping",
+        "to": "CODE_OF_CONDUCT.md",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "context_mapping",
+        "to": "SECURITY.md",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "context_mapping",
+        "to": ".gitignore",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "context_mapping",
+        "to": "extensions",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "extensions",
+        "to": "extensions/codex",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "extensions/codex",
+        "to": "extensions/codex/SKILL.md",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "extensions/codex",
+        "to": "extensions/codex/README.md",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "extensions",
+        "to": "extensions/gemini",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "extensions/gemini",
+        "to": "extensions/gemini/README.md",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "extensions/gemini",
+        "to": "extensions/gemini/GEMINI.md",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "context_mapping",
+        "to": "conductor",
+        "type": "CONTAINS"
+      },
+      {
+        "from": "conductor",
+        "to": "conductor/tracks/001-integrate-mem-map",
+        "type": "CONTAINS"
+      }
     ]
   },
-  "view": {
-    "layout": { "positions": {}, "frozen": false },
-    "filters": { "search": "", "showExisting": true, "showPlanned": true, "showNotes": true },
-    "panels": { "details": true, "controls": true }
+  "view": {},
+  "scan_meta": {
+    "root": "D:\\context_mapping",
+    "limits": {
+      "MAX_FILES": 5000,
+      "MAX_DEPTH": 8,
+      "MAX_BYTES": 26214400
+    },
+    "ts": "2025-12-21T07:39:47.997Z",
+    "errors": 0
   }
 }

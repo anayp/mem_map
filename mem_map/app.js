@@ -418,8 +418,8 @@ function escapeHtml(str) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-  .replace(/"/g, "&quot;")
-  .replace(/'/g, "&#039;");
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function normalizeMetadata(meta = {}) {
@@ -461,13 +461,16 @@ function initGraph() {
     .width(els.graph.clientWidth)
     .height(els.graph.clientHeight)
     .backgroundColor("#0a0f20")
+    .dagMode("td") // Top-down DAG layout
+    .dagLevelDistance(100)
+    .nodeRelSize(4) // default relative size
     .nodeLabel(node => formatLabel(node.raw))
     .nodeColor(node => nodeColor(node.raw))
-    .nodeVal(node => (state.selectedId && node.raw && node.raw.id === state.selectedId ? 5 : 4))
+    .nodeVal(1)
     .nodeCanvasObjectMode(() => "before")
     .nodeCanvasObject((node, ctx, globalScale) => {
       if (!state.selectedId || !node.raw || node.raw.id !== state.selectedId) return;
-      const size = (node.val || 4) * 2.2;
+      const size = 5 * 2.5; // Fixed halo size for disjoint selection visual
       ctx.save();
       ctx.beginPath();
       ctx.arc(node.x, node.y, size / globalScale, 0, 2 * Math.PI, false);
@@ -484,6 +487,9 @@ function initGraph() {
     .onNodeClick(node => {
       selectNode(node.raw);
     });
+
+  // Apply stronger repulsion to reduce clustering
+  graph.d3Force('charge').strength(-300);
 }
 
 function applyData(data) {
@@ -543,7 +549,7 @@ function selectNode(node) {
   renderHierarchy(node.id);
   renderFileTree(node.id);
   ensurePanelVisible("details");
-  queueRefresh();
+  // queueRefresh(); // Skip full auto-refresh to maintain layout stability
 }
 
 function filterData() {

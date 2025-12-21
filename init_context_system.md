@@ -178,7 +178,21 @@ Use the `mem_map/index.html` and `mem_map/style.css` in this repo as the canonic
 
 ---
 
-## 7) Summary
+## 7) Continuous Maintenance Protocol
+
+All intelligent agents (Human or AI) working in this repo are requested to:
+
+1.  **Update on Change**: If you add, move, or delete a file, update the corresponding node in `mem_map/data/context-data.json`.
+    -   *New File*: Add a node.
+    -   *Deleted File*: Remove the node.
+    -   *Renamed File*: Update `id`, `payload.path`, and `payload.relPath`.
+2.  **Update on Capability**: If you implement a feature described in a "planned" node (FUTURE_FILE/DIRECTORY), change its type to FILE/DIRECTORY and update status to DONE.
+3.  **Consistency Check**: Occassionally run the scan API to sync the graph with reality.
+    -   `curl -X POST -H "Content-Type: application/json" -d '{"path": "."}' http://localhost:4500/api/scan`
+
+---
+
+## 8) Summary
 
 This init protocol bootstraps the Memory Map system:
 - A local server + UI

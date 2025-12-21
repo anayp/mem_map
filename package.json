@@ -1,0 +1,20 @@
+{
+  "name": "memory-map-context",
+  "version": "1.0.0",
+  "description": "Granular context visualization and planning tool",
+  "scripts": {
+    "start": "node mem_map/server.js",
+    "scan": "node sync_mem_map.js",
+    "init": "echo 'See SKILL.md or init_context_system.md for instructions'"
+  },
+  "keywords": [
+    "context",
+    "visualization",
+    "planning",
+    "ai",
+    "agent"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
