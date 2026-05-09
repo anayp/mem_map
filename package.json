@@ -5,6 +5,9 @@
   "scripts": {
     "start": "node mem_map/server.js",
     "scan": "node sync_mem_map.js",
+    "import": "node import_mem_map.js",
+    "install:local": "bash scripts/install-memory-map.sh",
+    "test": "node --test test/*.test.js",
     "init": "echo 'See SKILL.md or init_context_system.md for instructions'"
   },
   "keywords": [

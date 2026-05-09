@@ -206,6 +206,52 @@ function normalizeBoardPayload(parsed, current) {
   };
 }
 
+function importToBoard(payload, current) {
+  const raw = payload && typeof payload === "object" ? payload : {};
+  const container = raw.graph && typeof raw.graph === "object" ? raw.graph : raw;
+  const rawNodes = Array.isArray(container.nodes) ? container.nodes : [];
+  const rawEdges = Array.isArray(container.edges) ? container.edges : [];
+
+  const nodes = rawNodes
+    .map((n, index) => {
+      const id = String(n.id || n.key || n.path || `import-node-${index}`);
+      const type = String(n.type || "FILE").toUpperCase();
+      const payloadNode = n.payload && typeof n.payload === "object" ? n.payload : { path: n.path || id, exists: true };
+      const metadata = n.metadata && typeof n.metadata === "object" ? n.metadata : {};
+      return { id, type, payload: payloadNode, metadata: { ...metadata, source: metadata.source || "import" } };
+    });
+
+  const nodeIds = new Set(nodes.map(n => n.id));
+  const edges = rawEdges
+    .map((e) => {
+      const from = String(e.from || e.source || "");
+      const to = String(e.to || e.target || "");
+      const type = String(e.type || "RELATES_TO");
+      return { from, to, type };
+    })
+    .filter(e => e.from && e.to && nodeIds.has(e.from) && nodeIds.has(e.to));
+
+  const board = normalizeBoardPayload({
+    schema_version: 2,
+    board_id: String(raw.board_id || "imported-memory-map"),
+    board_version: Number(raw.board_version || 0),
+    title: String(raw.title || "Imported Memory Map"),
+    content: { nodes, edges },
+    view: raw.view && typeof raw.view === "object" ? raw.view : {}
+  }, current);
+
+  return {
+    board,
+    report: {
+      input_nodes: rawNodes.length,
+      input_edges: rawEdges.length,
+      imported_nodes: nodes.length,
+      imported_edges: edges.length,
+      dropped_edges: rawEdges.length - edges.length
+    }
+  };
+}
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
@@ -301,6 +347,35 @@ const server = http.createServer((req, res) => {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ ok: true, board_version: normalized.board_version }));
       } catch (err) {
+        res.writeHead(400, { "Content-Type": "text/plain" });
+        res.end("Bad JSON");
+      }
+    });
+    return;
+  }
+
+  // API: import external graph payload into canonical board
+  if (url.pathname === "/api/import" && req.method === "POST") {
+    if (!requireToken(req, res)) return;
+    let body = "";
+    req.on("data", chunk => {
+      body += chunk.toString();
+      if (body.length > 5 * 1024 * 1024) {
+        res.writeHead(413, { "Content-Type": "text/plain" });
+        res.end("Payload too large");
+        req.destroy();
+      }
+    });
+    req.on("end", () => {
+      try {
+        const parsed = JSON.parse(body || "{}");
+        const current = readCurrentBoard();
+        const imported = importToBoard(parsed, current);
+        writeAtomic(JSON.stringify(imported.board, null, 2));
+        appendJournal({ event: "import", version: imported.board.board_version, report: imported.report });
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ ok: true, board_version: imported.board.board_version, report: imported.report }, null, 2));
+      } catch (_) {
         res.writeHead(400, { "Content-Type": "text/plain" });
         res.end("Bad JSON");
       }
