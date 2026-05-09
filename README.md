@@ -24,6 +24,18 @@ shared understanding of a repo as it evolves.
    ```
 4) Optional: scan a local path from the UI.
 
+### One-command bootstrap (shareable with CLI agents)
+You can share this single command with Codex, Gemini CLI, Antigravity, or any shell-capable agent:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/<you>/<repo>/main/README.md >/dev/null && npm i && npm run start
+```
+
+For local-only use in an already cloned repo:
+```bash
+npm i && npm run start
+```
+
 ## Configuration
 The server reads these environment variables:
 - `HOST` (default `127.0.0.1`)
@@ -75,3 +87,11 @@ Use:
 ```
 $memory-map-init
 ```
+
+## Agent install links (copy/paste friendly)
+- Codex: share `extensions/codex/SKILL.md`
+- Gemini CLI: share `extensions/gemini/GEMINI.md`
+- Generic agents: run `npm run start` then `npm run scan -- .`
+
+## Apache-2 friendly positioning
+Memory Map is MIT-licensed (permissive and Apache-2 compatible for most reuse flows). If you want strict Apache-2 distribution posture, add an Apache-2 relicense track and contributor sign-off process.

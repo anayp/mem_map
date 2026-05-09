@@ -71,7 +71,7 @@ function toRel(root, abs) {
 function scanPath(rootPath) {
   const nodes = [];
   const edges = [];
-  const rootId = path.basename(rootPath) || rootPath;
+  const rootId = path.resolve(rootPath).replace(/\\/g, "/");
   let fileCount = 0;
   let totalBytes = 0;
   let errorCount = 0;
@@ -134,7 +134,7 @@ function scanPath(rootPath) {
   walk(rootPath, 0);
   return {
     schema_version: 2,
-    board_id: `scan:${rootId}`,
+    board_id: `scan:${path.basename(rootPath) || "root"}`,
     board_version: 1,
     title: `Scan of ${rootPath}`,
     content: { nodes, edges },
@@ -189,6 +189,23 @@ function appendJournal(entry) {
   }
 }
 
+function normalizeBoardPayload(parsed, current) {
+  const isV2 = parsed && parsed.content && Array.isArray(parsed.content.nodes) && Array.isArray(parsed.content.edges);
+  const nodes = isV2 ? parsed.content.nodes : parsed.nodes;
+  const edges = isV2 ? parsed.content.edges : parsed.edges;
+  if (!parsed || typeof parsed !== "object" || !Array.isArray(nodes) || !Array.isArray(edges)) {
+    return null;
+  }
+  const currentVersion = Number((current && current.board_version) || 0);
+  const incomingVersion = Number(parsed.board_version || 0);
+  return {
+    ...parsed,
+    schema_version: 2,
+    board_version: Math.max(incomingVersion, currentVersion + 1, 1),
+    content: { nodes, edges }
+  };
+}
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
@@ -239,6 +256,12 @@ const server = http.createServer((req, res) => {
           return;
         }
         const result = scanPath(abs);
+        if (parsed.save === true) {
+          const current = readCurrentBoard();
+          const persisted = normalizeBoardPayload(result, current);
+          writeAtomic(JSON.stringify(persisted, null, 2));
+          appendJournal({ event: "scan-save", version: persisted.board_version, root: abs });
+        }
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(result, null, 2));
       } catch (err) {
@@ -265,31 +288,18 @@ const server = http.createServer((req, res) => {
     req.on("end", () => {
       try {
         const parsed = JSON.parse(body);
-        const isV2 = parsed && parsed.content && Array.isArray(parsed.content.nodes) && Array.isArray(parsed.content.edges);
-        const nodes = isV2 ? parsed.content.nodes : parsed.nodes;
-        const edges = isV2 ? parsed.content.edges : parsed.edges;
-        if (!parsed || typeof parsed !== "object" || !Array.isArray(nodes) || !Array.isArray(edges)) {
+        const current = readCurrentBoard();
+        const normalized = normalizeBoardPayload(parsed, current);
+        if (!normalized) {
           res.writeHead(400, { "Content-Type": "text/plain" });
           res.end("Invalid context payload");
           return;
         }
-        // version check
-        const current = readCurrentBoard();
-        const incomingVersion = parsed.board_version || (parsed.content && parsed.content.board_version) || 1;
-        const currentVersion = current && (current.board_version || 1);
-        if (current && incomingVersion !== currentVersion) {
-          res.writeHead(409, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, conflict: true, board_version: currentVersion }));
-          return;
-        }
-        const nextVersion = (currentVersion || 0) + 1;
-        parsed.board_version = nextVersion;
-        if (!parsed.schema_version) parsed.schema_version = 2;
-        const jsonString = JSON.stringify(parsed, null, 2);
+        const jsonString = JSON.stringify(normalized, null, 2);
         writeAtomic(jsonString);
-        appendJournal({ event: "save", version: nextVersion, size: jsonString.length });
+        appendJournal({ event: "save", version: normalized.board_version, size: jsonString.length });
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ ok: true, board_version: nextVersion }));
+        res.end(JSON.stringify({ ok: true, board_version: normalized.board_version }));
       } catch (err) {
         res.writeHead(400, { "Content-Type": "text/plain" });
         res.end("Bad JSON");
