@@ -95,3 +95,11 @@ $memory-map-init
 
 ## Apache-2 friendly positioning
 Memory Map is MIT-licensed (permissive and Apache-2 compatible for most reuse flows). If you want strict Apache-2 distribution posture, add an Apache-2 relicense track and contributor sign-off process.
+
+## Clean-room development
+To reduce legal risk when taking inspiration from adjacent tools, use a clean-room process:
+- independent design and naming,
+- no copying of external code/tests/docs,
+- provenance notes in PRs.
+
+See: `docs/CLEAN_ROOM_EXPERT_SWEEP.md`.
