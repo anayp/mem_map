@@ -17,6 +17,8 @@ const SCAN_ROOT = path.resolve(process.env.MEMMAP_SCAN_ROOT || process.cwd());
 const MAX_FILES = Number(process.env.MEMMAP_MAX_FILES || 5000);
 const MAX_DEPTH = Number(process.env.MEMMAP_MAX_DEPTH || 8);
 const MAX_BYTES = Number(process.env.MEMMAP_MAX_BYTES || 25 * 1024 * 1024);
+const MAX_IMPORT_NODES = Number(process.env.MEMMAP_MAX_IMPORT_NODES || 50000);
+const MAX_IMPORT_EDGES = Number(process.env.MEMMAP_MAX_IMPORT_EDGES || 100000);
 const DEBUG_ABS = !!process.env.MEMMAP_DEBUG_ABS;
 
 const mime = {
@@ -212,7 +214,13 @@ function importToBoard(payload, current) {
   const rawNodes = Array.isArray(container.nodes) ? container.nodes : [];
   const rawEdges = Array.isArray(container.edges) ? container.edges : [];
 
-  const nodes = rawNodes
+  const warnings = [];
+  if (rawNodes.length > MAX_IMPORT_NODES) warnings.push(`Node limit exceeded; truncating to ${MAX_IMPORT_NODES}`);
+  if (rawEdges.length > MAX_IMPORT_EDGES) warnings.push(`Edge limit exceeded; truncating to ${MAX_IMPORT_EDGES}`);
+  const cappedNodes = rawNodes.slice(0, MAX_IMPORT_NODES);
+  const cappedEdges = rawEdges.slice(0, MAX_IMPORT_EDGES);
+
+  const nodes = cappedNodes
     .map((n, index) => {
       const id = String(n.id || n.key || n.path || `import-node-${index}`);
       const type = String(n.type || "FILE").toUpperCase();
@@ -222,7 +230,7 @@ function importToBoard(payload, current) {
     });
 
   const nodeIds = new Set(nodes.map(n => n.id));
-  const edges = rawEdges
+  const edges = cappedEdges
     .map((e) => {
       const from = String(e.from || e.source || "");
       const to = String(e.to || e.target || "");
@@ -247,7 +255,8 @@ function importToBoard(payload, current) {
       input_edges: rawEdges.length,
       imported_nodes: nodes.length,
       imported_edges: edges.length,
-      dropped_edges: rawEdges.length - edges.length
+      dropped_edges: rawEdges.length - edges.length,
+      warnings
     }
   };
 }
@@ -371,10 +380,13 @@ const server = http.createServer((req, res) => {
         const parsed = JSON.parse(body || "{}");
         const current = readCurrentBoard();
         const imported = importToBoard(parsed, current);
-        writeAtomic(JSON.stringify(imported.board, null, 2));
-        appendJournal({ event: "import", version: imported.board.board_version, report: imported.report });
+        const dryRun = parsed && parsed.options && parsed.options.dry_run === true;
+        if (!dryRun) {
+          writeAtomic(JSON.stringify(imported.board, null, 2));
+          appendJournal({ event: "import", version: imported.board.board_version, report: imported.report });
+        }
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ ok: true, board_version: imported.board.board_version, report: imported.report }, null, 2));
+        res.end(JSON.stringify({ ok: true, dry_run: dryRun, board_version: imported.board.board_version, report: imported.report }, null, 2));
       } catch (_) {
         res.writeHead(400, { "Content-Type": "text/plain" });
         res.end("Bad JSON");

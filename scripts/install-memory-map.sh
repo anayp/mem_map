@@ -7,4 +7,6 @@ if ! command -v npm >/dev/null 2>&1; then
 fi
 
 npm install
-npm run start
+echo "Installed successfully."
+echo "Run: npm run start"
+echo "Then: npm run scan -- ."

@@ -19,7 +19,7 @@ async function req(path, method, body) {
 
 let server;
 test.before(async () => {
-  server = spawn('node', ['mem_map/server.js'], { env: { ...process.env, HOST, PORT: String(PORT) } });
+  server = spawn('node', ['mem_map/server.js'], { env: { ...process.env, HOST, PORT: String(PORT), MEMMAP_MAX_IMPORT_NODES: '1' } });
   await new Promise(r => setTimeout(r, 500));
 });
 
@@ -35,10 +35,19 @@ test('scan save persists and import works', async () => {
   });
   assert.equal(imported.status, 200);
   assert.equal(imported.json.ok, true);
-  assert.equal(imported.json.report.imported_nodes, 2);
+  assert.equal(imported.json.report.imported_nodes, 1);
+  assert.equal(Array.isArray(imported.json.report.warnings), true);
+
+  const dryRun = await req('/api/import', 'POST', {
+    nodes: [{ id: 'c' }, { id: 'd' }],
+    edges: [{ from: 'c', to: 'd' }],
+    options: { dry_run: true }
+  });
+  assert.equal(dryRun.status, 200);
+  assert.equal(dryRun.json.dry_run, true);
 
   const ctx = await req('/api/context', 'GET');
   assert.equal(ctx.status, 200);
   assert.equal(Array.isArray(ctx.json.content.nodes), true);
-  assert.equal(ctx.json.content.nodes.length >= 2, true);
+  assert.equal(ctx.json.content.nodes.length >= 1, true);
 });

@@ -43,6 +43,7 @@ The server reads these environment variables:
 - `MEMMAP_TOKEN` (optional API token; send via `x-memmap-token`)
 - `MEMMAP_SCAN_ROOT` (sandbox root for scans)
 - `MEMMAP_MAX_FILES`, `MEMMAP_MAX_DEPTH`, `MEMMAP_MAX_BYTES`
+- `MEMMAP_MAX_IMPORT_NODES`, `MEMMAP_MAX_IMPORT_EDGES`
 - `MEMMAP_DEBUG_ABS` (include `absPath` in scan output)
 
 Example:
@@ -55,6 +56,7 @@ PORT=4501 MEMMAP_TOKEN=yourtoken MEMMAP_SCAN_ROOT=D:\repos node mem_map/server.j
 - `POST /api/context` -> save board (version-checked)
 - `POST /api/scan` -> scan a path and return a board (optionally persist with `save: true`)
 - `POST /api/import` -> import external graph JSON and persist canonical board
+  - pass `options.dry_run: true` to preview import report without persisting
 
 ## Repo structure
 - `mem_map/index.html` - UI shell
@@ -94,6 +96,7 @@ $memory-map-init
 - Gemini CLI: share `extensions/gemini/GEMINI.md`
 - Generic agents: run `npm run start` then `npm run scan -- .`
   - External graph ingest: `npm run import -- ./graph.json`
+  - Preview only (no persistence): `npm run import -- ./graph.json --dry-run`
 
 ## Apache-2 friendly positioning
 Memory Map is MIT-licensed (permissive and Apache-2 compatible for most reuse flows). If you want strict Apache-2 distribution posture, add an Apache-2 relicense track and contributor sign-off process.

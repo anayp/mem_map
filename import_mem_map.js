@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 4500;
 const HOST = process.env.HOST || '127.0.0.1';
 const TOKEN = process.env.MEMMAP_TOKEN;
 const INPUT = process.argv[2];
+const DRY_RUN = process.argv.includes('--dry-run');
 
 if (!INPUT) {
   console.error('Usage: node import_mem_map.js <graph.json>');
@@ -13,7 +14,12 @@ if (!INPUT) {
 }
 
 const abs = path.resolve(INPUT);
-const payload = fs.readFileSync(abs, 'utf8');
+let payload = fs.readFileSync(abs, 'utf8');
+if (DRY_RUN) {
+  const parsed = JSON.parse(payload);
+  parsed.options = { ...(parsed.options || {}), dry_run: true };
+  payload = JSON.stringify(parsed);
+}
 
 const req = http.request({
   hostname: HOST,
