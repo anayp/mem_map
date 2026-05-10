@@ -24,6 +24,18 @@ shared understanding of a repo as it evolves.
    ```
 4) Optional: scan a local path from the UI.
 
+### One-command bootstrap (shareable with CLI agents)
+You can share this single command with Codex, Gemini CLI, Antigravity, or any shell-capable agent:
+
+```bash
+bash scripts/install-memory-map.sh
+```
+
+For local-only use in an already cloned repo:
+```bash
+npm i && npm run start
+```
+
 ## Configuration
 The server reads these environment variables:
 - `HOST` (default `127.0.0.1`)
@@ -31,6 +43,7 @@ The server reads these environment variables:
 - `MEMMAP_TOKEN` (optional API token; send via `x-memmap-token`)
 - `MEMMAP_SCAN_ROOT` (sandbox root for scans)
 - `MEMMAP_MAX_FILES`, `MEMMAP_MAX_DEPTH`, `MEMMAP_MAX_BYTES`
+- `MEMMAP_MAX_IMPORT_NODES`, `MEMMAP_MAX_IMPORT_EDGES`
 - `MEMMAP_DEBUG_ABS` (include `absPath` in scan output)
 
 Example:
@@ -41,7 +54,10 @@ PORT=4501 MEMMAP_TOKEN=yourtoken MEMMAP_SCAN_ROOT=D:\repos node mem_map/server.j
 ## API (local server)
 - `GET /api/context` -> current board JSON
 - `POST /api/context` -> save board (version-checked)
-- `POST /api/scan` -> scan a path and return a board
+- `POST /api/scan` -> scan a path and return a board (optionally persist with `save: true`)
+- `POST /api/import` -> import external graph JSON and persist canonical board
+  - pass `options.dry_run: true` to preview import report without persisting
+  - UI support: Controls panel includes an "External import" editor with warning/report feedback
 
 ## Repo structure
 - `mem_map/index.html` - UI shell
@@ -75,3 +91,21 @@ Use:
 ```
 $memory-map-init
 ```
+
+## Agent install links (copy/paste friendly)
+- Codex: share `extensions/codex/SKILL.md`
+- Gemini CLI: share `extensions/gemini/GEMINI.md`
+- Generic agents: run `npm run start` then `npm run scan -- .`
+  - External graph ingest: `npm run import -- ./graph.json`
+  - Preview only (no persistence): `npm run import -- ./graph.json --dry-run`
+
+## Apache-2 friendly positioning
+Memory Map is MIT-licensed (permissive and Apache-2 compatible for most reuse flows). If you want strict Apache-2 distribution posture, add an Apache-2 relicense track and contributor sign-off process.
+
+## Clean-room development
+To reduce legal risk when taking inspiration from adjacent tools, use a clean-room process:
+- independent design and naming,
+- no copying of external code/tests/docs,
+- provenance notes in PRs.
+
+See: `docs/CLEAN_ROOM_EXPERT_SWEEP.md`.

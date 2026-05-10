@@ -17,6 +17,8 @@ const SCAN_ROOT = path.resolve(process.env.MEMMAP_SCAN_ROOT || process.cwd());
 const MAX_FILES = Number(process.env.MEMMAP_MAX_FILES || 5000);
 const MAX_DEPTH = Number(process.env.MEMMAP_MAX_DEPTH || 8);
 const MAX_BYTES = Number(process.env.MEMMAP_MAX_BYTES || 25 * 1024 * 1024);
+const MAX_IMPORT_NODES = Number(process.env.MEMMAP_MAX_IMPORT_NODES || 50000);
+const MAX_IMPORT_EDGES = Number(process.env.MEMMAP_MAX_IMPORT_EDGES || 100000);
 const DEBUG_ABS = !!process.env.MEMMAP_DEBUG_ABS;
 
 const mime = {
@@ -71,7 +73,7 @@ function toRel(root, abs) {
 function scanPath(rootPath) {
   const nodes = [];
   const edges = [];
-  const rootId = path.basename(rootPath) || rootPath;
+  const rootId = path.resolve(rootPath).replace(/\\/g, "/");
   let fileCount = 0;
   let totalBytes = 0;
   let errorCount = 0;
@@ -134,7 +136,7 @@ function scanPath(rootPath) {
   walk(rootPath, 0);
   return {
     schema_version: 2,
-    board_id: `scan:${rootId}`,
+    board_id: `scan:${path.basename(rootPath) || "root"}`,
     board_version: 1,
     title: `Scan of ${rootPath}`,
     content: { nodes, edges },
@@ -189,6 +191,76 @@ function appendJournal(entry) {
   }
 }
 
+function normalizeBoardPayload(parsed, current) {
+  const isV2 = parsed && parsed.content && Array.isArray(parsed.content.nodes) && Array.isArray(parsed.content.edges);
+  const nodes = isV2 ? parsed.content.nodes : parsed.nodes;
+  const edges = isV2 ? parsed.content.edges : parsed.edges;
+  if (!parsed || typeof parsed !== "object" || !Array.isArray(nodes) || !Array.isArray(edges)) {
+    return null;
+  }
+  const currentVersion = Number((current && current.board_version) || 0);
+  const incomingVersion = Number(parsed.board_version || 0);
+  return {
+    ...parsed,
+    schema_version: 2,
+    board_version: Math.max(incomingVersion, currentVersion + 1, 1),
+    content: { nodes, edges }
+  };
+}
+
+function importToBoard(payload, current) {
+  const raw = payload && typeof payload === "object" ? payload : {};
+  const container = raw.graph && typeof raw.graph === "object" ? raw.graph : raw;
+  const rawNodes = Array.isArray(container.nodes) ? container.nodes : [];
+  const rawEdges = Array.isArray(container.edges) ? container.edges : [];
+
+  const warnings = [];
+  if (rawNodes.length > MAX_IMPORT_NODES) warnings.push(`Node limit exceeded; truncating to ${MAX_IMPORT_NODES}`);
+  if (rawEdges.length > MAX_IMPORT_EDGES) warnings.push(`Edge limit exceeded; truncating to ${MAX_IMPORT_EDGES}`);
+  const cappedNodes = rawNodes.slice(0, MAX_IMPORT_NODES);
+  const cappedEdges = rawEdges.slice(0, MAX_IMPORT_EDGES);
+
+  const nodes = cappedNodes
+    .map((n, index) => {
+      const id = String(n.id || n.key || n.path || `import-node-${index}`);
+      const type = String(n.type || "FILE").toUpperCase();
+      const payloadNode = n.payload && typeof n.payload === "object" ? n.payload : { path: n.path || id, exists: true };
+      const metadata = n.metadata && typeof n.metadata === "object" ? n.metadata : {};
+      return { id, type, payload: payloadNode, metadata: { ...metadata, source: metadata.source || "import" } };
+    });
+
+  const nodeIds = new Set(nodes.map(n => n.id));
+  const edges = cappedEdges
+    .map((e) => {
+      const from = String(e.from || e.source || "");
+      const to = String(e.to || e.target || "");
+      const type = String(e.type || "RELATES_TO");
+      return { from, to, type };
+    })
+    .filter(e => e.from && e.to && nodeIds.has(e.from) && nodeIds.has(e.to));
+
+  const board = normalizeBoardPayload({
+    schema_version: 2,
+    board_id: String(raw.board_id || "imported-memory-map"),
+    board_version: Number(raw.board_version || 0),
+    title: String(raw.title || "Imported Memory Map"),
+    content: { nodes, edges },
+    view: raw.view && typeof raw.view === "object" ? raw.view : {}
+  }, current);
+
+  return {
+    board,
+    report: {
+      input_nodes: rawNodes.length,
+      input_edges: rawEdges.length,
+      imported_nodes: nodes.length,
+      imported_edges: edges.length,
+      dropped_edges: rawEdges.length - edges.length,
+      warnings
+    }
+  };
+}
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
@@ -239,6 +311,12 @@ const server = http.createServer((req, res) => {
           return;
         }
         const result = scanPath(abs);
+        if (parsed.save === true) {
+          const current = readCurrentBoard();
+          const persisted = normalizeBoardPayload(result, current);
+          writeAtomic(JSON.stringify(persisted, null, 2));
+          appendJournal({ event: "scan-save", version: persisted.board_version, root: abs });
+        }
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(result, null, 2));
       } catch (err) {
@@ -265,32 +343,51 @@ const server = http.createServer((req, res) => {
     req.on("end", () => {
       try {
         const parsed = JSON.parse(body);
-        const isV2 = parsed && parsed.content && Array.isArray(parsed.content.nodes) && Array.isArray(parsed.content.edges);
-        const nodes = isV2 ? parsed.content.nodes : parsed.nodes;
-        const edges = isV2 ? parsed.content.edges : parsed.edges;
-        if (!parsed || typeof parsed !== "object" || !Array.isArray(nodes) || !Array.isArray(edges)) {
+        const current = readCurrentBoard();
+        const normalized = normalizeBoardPayload(parsed, current);
+        if (!normalized) {
           res.writeHead(400, { "Content-Type": "text/plain" });
           res.end("Invalid context payload");
           return;
         }
-        // version check
-        const current = readCurrentBoard();
-        const incomingVersion = parsed.board_version || (parsed.content && parsed.content.board_version) || 1;
-        const currentVersion = current && (current.board_version || 1);
-        if (current && incomingVersion !== currentVersion) {
-          res.writeHead(409, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, conflict: true, board_version: currentVersion }));
-          return;
-        }
-        const nextVersion = (currentVersion || 0) + 1;
-        parsed.board_version = nextVersion;
-        if (!parsed.schema_version) parsed.schema_version = 2;
-        const jsonString = JSON.stringify(parsed, null, 2);
+        const jsonString = JSON.stringify(normalized, null, 2);
         writeAtomic(jsonString);
-        appendJournal({ event: "save", version: nextVersion, size: jsonString.length });
+        appendJournal({ event: "save", version: normalized.board_version, size: jsonString.length });
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ ok: true, board_version: nextVersion }));
+        res.end(JSON.stringify({ ok: true, board_version: normalized.board_version }));
       } catch (err) {
+        res.writeHead(400, { "Content-Type": "text/plain" });
+        res.end("Bad JSON");
+      }
+    });
+    return;
+  }
+
+  // API: import external graph payload into canonical board
+  if (url.pathname === "/api/import" && req.method === "POST") {
+    if (!requireToken(req, res)) return;
+    let body = "";
+    req.on("data", chunk => {
+      body += chunk.toString();
+      if (body.length > 5 * 1024 * 1024) {
+        res.writeHead(413, { "Content-Type": "text/plain" });
+        res.end("Payload too large");
+        req.destroy();
+      }
+    });
+    req.on("end", () => {
+      try {
+        const parsed = JSON.parse(body || "{}");
+        const current = readCurrentBoard();
+        const imported = importToBoard(parsed, current);
+        const dryRun = parsed && parsed.options && parsed.options.dry_run === true;
+        if (!dryRun) {
+          writeAtomic(JSON.stringify(imported.board, null, 2));
+          appendJournal({ event: "import", version: imported.board.board_version, report: imported.report });
+        }
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ ok: true, dry_run: dryRun, board_version: imported.board.board_version, report: imported.report }, null, 2));
+      } catch (_) {
         res.writeHead(400, { "Content-Type": "text/plain" });
         res.end("Bad JSON");
       }

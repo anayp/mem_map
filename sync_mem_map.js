@@ -4,9 +4,11 @@ const path = require('path');
 const PORT = process.env.PORT || 4500;
 const HOST = process.env.HOST || '127.0.0.1';
 const TARGET_PATH = process.argv[2] || '.';
+const TOKEN = process.env.MEMMAP_TOKEN;
 
 const payload = JSON.stringify({
-  path: path.resolve(TARGET_PATH)
+  path: path.resolve(TARGET_PATH),
+  save: true
 });
 
 const options = {
@@ -16,7 +18,8 @@ const options = {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Content-Length': payload.length
+    'Content-Length': payload.length,
+    ...(TOKEN ? { 'x-memmap-token': TOKEN } : {})
   }
 };
 

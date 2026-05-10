@@ -317,6 +317,10 @@ const els = {
   scanButton: document.getElementById("scan-button"),
   scanAuto: document.getElementById("scan-auto"),
   scanStatus: document.getElementById("scan-status"),
+  importJson: document.getElementById("import-json"),
+  importButton: document.getElementById("import-button"),
+  importDryRun: document.getElementById("import-dry-run"),
+  importStatus: document.getElementById("import-status"),
   freezeLayout: document.getElementById("freeze-layout"),
   saveLayout: document.getElementById("save-layout"),
   rawPanel: document.getElementById("raw-panel"),
@@ -898,6 +902,9 @@ function attachEvents() {
       localStorage.setItem("memmap.scanPath", e.target.value);
     });
   }
+  if (els.importButton) {
+    els.importButton.addEventListener("click", () => importFromJson());
+  }
 
   maybeAutoScan();
 }
@@ -1203,6 +1210,50 @@ function setScanStatus(msg, isError) {
   if (!els.scanStatus) return;
   els.scanStatus.textContent = msg;
   els.scanStatus.style.color = isError ? "#ff9fb6" : "var(--muted)";
+}
+
+function setImportStatus(msg, isError = false) {
+  if (!els.importStatus) return;
+  els.importStatus.textContent = msg;
+  els.importStatus.style.color = isError ? "#ff9fb6" : "var(--muted)";
+}
+
+async function importFromJson() {
+  const raw = (els.importJson?.value || "").trim();
+  if (!raw) {
+    setImportStatus("Paste JSON payload before importing.", true);
+    return;
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    setImportStatus(`Invalid JSON: ${err.message || err}`, true);
+    return;
+  }
+  if (els.importDryRun?.checked) {
+    parsed.options = { ...(parsed.options || {}), dry_run: true };
+  }
+  setImportStatus("Importing...", false);
+  try {
+    const res = await apiPost("/api/import", parsed);
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(text || `Import failed (${res.status})`);
+    }
+    const payload = await res.json();
+    const report = payload.report || {};
+    const warningText = Array.isArray(report.warnings) && report.warnings.length
+      ? ` Warnings: ${report.warnings.join("; ")}`
+      : "";
+    setImportStatus(
+      `Import ok${payload.dry_run ? " (dry run)" : ""}. Nodes: ${report.imported_nodes ?? 0}, Edges: ${report.imported_edges ?? 0}.${warningText}`,
+      false
+    );
+    if (!payload.dry_run) await loadContext();
+  } catch (err) {
+    setImportStatus(`Import failed: ${err.message || err}`, true);
+  }
 }
 
 function togglePanel(name) {
