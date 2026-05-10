@@ -143,6 +143,21 @@
         <input type="text" id="api-token" placeholder="Optional token for API calls" />
         <p class="form-note" id="scan-status">Uses /api/scan on the server to build nodes/edges. Falls back to bundled data if it fails.</p>
       </div>
+      <div class="subpanel">
+        <div class="subpanel-head">
+          <p class="eyebrow">External import</p>
+          <span class="chip subtle">/api/import</span>
+        </div>
+        <label for="import-json">Import JSON payload</label>
+        <textarea id="import-json" rows="6" placeholder='{"nodes":[{"id":"a"}],"edges":[]}'></textarea>
+        <div class="form-actions">
+          <button type="button" id="import-button" class="primary">Import JSON</button>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
+            <input type="checkbox" id="import-dry-run" /> Dry run
+          </label>
+        </div>
+        <pre class="form-note" id="import-status">Paste JSON and click Import JSON.</pre>
+      </div>
 
       <div class="legend">
         <div class="legend-item"><span class="swatch file"></span>File</div>

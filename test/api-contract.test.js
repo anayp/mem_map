@@ -51,3 +51,21 @@ test('scan save persists and import works', async () => {
   assert.equal(Array.isArray(ctx.json.content.nodes), true);
   assert.equal(ctx.json.content.nodes.length >= 1, true);
 });
+
+test('import rejects bad json and token-protected endpoints reject missing token', async () => {
+  const bad = await fetch(`http://${HOST}:${PORT}/api/import`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: '{"nodes":'
+  });
+  assert.equal(bad.status, 400);
+
+  const lockedPort = 4512;
+  const locked = spawn('node', ['mem_map/server.js'], {
+    env: { ...process.env, HOST, PORT: String(lockedPort), MEMMAP_TOKEN: 'secret' }
+  });
+  await new Promise(r => setTimeout(r, 400));
+  const unauthorized = await fetch(`http://${HOST}:${lockedPort}/api/context`, { method: 'GET' });
+  assert.equal(unauthorized.status, 401);
+  locked.kill('SIGTERM');
+});

@@ -57,6 +57,7 @@ PORT=4501 MEMMAP_TOKEN=yourtoken MEMMAP_SCAN_ROOT=D:\repos node mem_map/server.j
 - `POST /api/scan` -> scan a path and return a board (optionally persist with `save: true`)
 - `POST /api/import` -> import external graph JSON and persist canonical board
   - pass `options.dry_run: true` to preview import report without persisting
+  - UI support: Controls panel includes an "External import" editor with warning/report feedback
 
 ## Repo structure
 - `mem_map/index.html` - UI shell
